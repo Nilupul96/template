@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:sizer/sizer.dart';
-import 'package:template/shimmers/shimmer_config.dart';
-import '../common/app_colors.dart';
+import '../app_colors.dart';
+import 'shimmer_config.dart';
 
-class TripCardShimmer extends StatelessWidget {
+class CardShimmer extends StatelessWidget {
   final int itemCount;
   final Axis axis;
   final double width;
@@ -12,7 +12,7 @@ class TripCardShimmer extends StatelessWidget {
   final bool primary;
   final bool shrinkWrap;
 
-  const TripCardShimmer(
+  const CardShimmer(
       {Key? key,
       this.itemCount = 10,
       this.axis = Axis.horizontal,

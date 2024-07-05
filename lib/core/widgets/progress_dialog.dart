@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:template/common/widgets/progress_view.dart';
+
+import 'progress_view.dart';
 
 var _context;
 bool _isShowing = false;

@@ -2,17 +2,10 @@ import 'dart:ui';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sizer/sizer.dart';
-import '../../helpers/app_logger.dart';
-import '../../helpers/connectivity_manager.dart';
-import '../../models/user.dart';
-import '../../network/net_result.dart';
-import '../../providers/chat_provider.dart';
-import '../../providers/user_provider.dart';
-import '../app/app_colors.dart';
-import '../app/app_const.dart';
-import '../app/app_custom_size.dart';
-import '../textStyles/custom_text_style.dart';
+import '../app_colors.dart';
+import '../helpers/app_logger.dart';
+import '../helpers/connectivity_manager.dart';
+import '../network/net_result.dart';
 
 class BaseWidget extends StatefulWidget {
   final Widget child;
@@ -51,7 +44,6 @@ class _BaseWidgetState extends State<BaseWidget> {
         }
         if (!internetAvailable) {
           Navigator.of(context).pop();
-          reconnectToChat();
         }
 
         internetAvailable = true;
@@ -64,19 +56,6 @@ class _BaseWidgetState extends State<BaseWidget> {
         });
       }
     });
-  }
-
-  reconnectToChat() async {
-    User? currentUser =
-        Provider.of<UserProvider>(context, listen: false).currentUser;
-    if (currentUser == null) return;
-    Result result = await Provider.of<ChatProvider>(context, listen: false)
-        .chatLogin(currentUser.email!);
-    if (result.exception == null) {
-      Provider.of<ChatProvider>(context, listen: false).getChatList();
-      Provider.of<ChatProvider>(context, listen: false)
-          .getAllUnreadMessageCount();
-    }
   }
 
   @override
@@ -116,7 +95,7 @@ class _BaseWidgetState extends State<BaseWidget> {
                       ? Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(24),
-                            color: AppColors.introDialogBg,
+                            color: AppColors.bgBlue,
                           ),
                           child: Padding(
                               padding: const EdgeInsets.symmetric(
@@ -129,19 +108,14 @@ class _BaseWidgetState extends State<BaseWidget> {
                                   RichText(
                                     text: TextSpan(
                                         text: "Oops!!\n",
-                                        style: TextStyle(
-                                            fontFamily: 'ClashDisplay',
-                                            color: Color(0xFF000000),
-                                            height: 1.2,
-                                            fontSize:
-                                                CustomSize.getFontSize(22),
-                                            fontStyle: FontStyle.normal,
-                                            fontWeight: FontWeight.w800),
-                                        children: [
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
+                                        children: const [
                                           TextSpan(
-                                              text:
-                                                  "It looks like you've lost your internet connection.\nTrying to reconnect, please wait a moment",
-                                              style: CustomTextStyle.h2())
+                                            text:
+                                                "It looks like you've lost your internet connection.\nTrying to reconnect, please wait a moment",
+                                          )
                                         ]),
                                     textAlign: TextAlign.center,
                                   )

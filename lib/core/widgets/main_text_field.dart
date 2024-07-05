@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:template/common/app_colors.dart';
-import '../../helpers/enum.dart';
+
+import '../app_colors.dart';
+import '../helpers/enum.dart';
 
 class CustomTextFormField extends StatefulWidget {
   final String labelText;

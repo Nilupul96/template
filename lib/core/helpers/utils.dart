@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../common/widgets/snackbar_dialog.dart';
+import '../widgets/snackbar_dialog.dart';
 
 class Utils {
   static bool isValidEmail(

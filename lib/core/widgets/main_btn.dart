@@ -3,7 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:rive/rive.dart';
 import '../app_assets.dart';
 import '../app_colors.dart';
-import '../../helpers/app_logger.dart';
+import '../helpers/app_logger.dart';
 
 class MainBtn extends StatefulWidget {
   final String lbl;

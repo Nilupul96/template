@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:intl/intl.dart';
-import 'package:template/network/cache_service.dart';
-import 'package:template/network/net.dart';
 import '../helpers/app_logger.dart';
 import '../helpers/connectivity_manager.dart';
+import 'cache_service.dart';
 import 'hive_cache_manager.dart';
+import 'net.dart';
 import 'net_exception.dart';
 import 'net_result.dart';
 

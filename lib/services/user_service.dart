@@ -1,10 +1,10 @@
 import 'dart:convert';
-import '../helpers/app_logger.dart';
-import '../network/net_exception.dart';
-import '../network/cache_network_service.dart';
-import '../network/net.dart';
-import '../network/net_result.dart';
-import '../network/net_url.dart';
+import '../core/helpers/app_logger.dart';
+import '../core/network/net_exception.dart';
+import '../core/network/cache_network_service.dart';
+import '../core/network/net.dart';
+import '../core/network/net_result.dart';
+import '../core/network/net_url.dart';
 
 class UserService {
   static const BOX_NAME = "userService";

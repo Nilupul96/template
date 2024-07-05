@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:template/common/app_colors.dart';
+
+import '../app_colors.dart';
 
 class ProgressView extends StatefulWidget {
   const ProgressView({Key? key}) : super(key: key);
