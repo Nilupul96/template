@@ -1,11 +1,9 @@
 import 'dart:ui';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../app_colors.dart';
 import '../helpers/app_logger.dart';
 import '../helpers/connectivity_manager.dart';
-import '../network/net_result.dart';
 
 class BaseWidget extends StatefulWidget {
   final Widget child;
@@ -61,11 +59,11 @@ class _BaseWidgetState extends State<BaseWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: () => FocusScope.of(context).unfocus(),
             child: AbsorbPointer(
                 absorbing: widget.isScreenDisable, child: widget.child),

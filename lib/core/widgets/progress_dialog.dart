@@ -45,9 +45,9 @@ class ProgressDialog {
               insetAnimationCurve: _insetAnimCurve,
               insetAnimationDuration: const Duration(milliseconds: 100),
               elevation: 0,
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const <Widget>[ProgressView()],
+                children: <Widget>[ProgressView()],
               ),
             ),
           );

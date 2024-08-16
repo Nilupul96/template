@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-
 import '../app_colors.dart';
 
 class ProgressView extends StatefulWidget {
@@ -18,11 +17,7 @@ class _ProgressViewState extends State<ProgressView> {
       child: SizedBox(
         width: 70.0,
         height: 70.0,
-        child: SizedBox(
-          height: 60.0,
-          width: 60.0,
-          child: SpinKitCircle(color: AppColors.bgBlue, size: 60),
-        ),
+        child: SpinKitCircle(color: AppColors.bgBlue, size: 60),
       ),
     );
   }

@@ -9,7 +9,6 @@ class NetworkErrorHandler {
     if (response.statusCode! >= 200 && response.statusCode! < 300) {
       return null;
     }
-
     NetException errorMessage;
     try {
       if (response.statusCode == 503) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:rive/rive.dart';
 import '../app_assets.dart';
@@ -10,19 +11,17 @@ class MainBtn extends StatefulWidget {
   final Function onClick;
   final bool isLoading;
   final bool isEnabled;
-  final bool isShowAnim;
-  final Color bgColor;
+  final Color? bgColor;
   final String? icon;
   final bool disableSplash;
 
   const MainBtn(
       {Key? key,
       this.lbl = "",
-      required this.bgColor,
+      this.bgColor,
       required this.onClick,
       this.isLoading = false,
       this.isEnabled = true,
-      this.isShowAnim = false,
       this.disableSplash = false,
       this.icon})
       : super(key: key);
@@ -32,16 +31,15 @@ class MainBtn extends StatefulWidget {
 }
 
 class _MainBtnState extends State<MainBtn> {
-  bool showAnim = false;
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 50,
+      height: 44.h,
       child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            primary: !widget.isEnabled ? AppColors.bgBlue : widget.bgColor,
+            foregroundColor:
+                !widget.isEnabled ? AppColors.bgBlue : widget.bgColor,
             elevation: 0.0,
             splashFactory: widget.disableSplash
                 ? NoSplash.splashFactory
@@ -53,51 +51,29 @@ class _MainBtnState extends State<MainBtn> {
           onPressed: widget.isEnabled
               ? !widget.isLoading
                   ? () async {
-                      if (widget.isShowAnim) {
-                        setState(() {
-                          showAnim = true;
-                        });
-                        Log.debug("showAnim $showAnim");
-                      }
                       await widget.onClick();
-                      if (widget.isShowAnim) {
-                        setState(() {
-                          showAnim = false;
-                        });
-                        Log.debug("showAnim $showAnim");
-                      }
                     }
                   : null
               : null,
-          child: showAnim
-              ? SizedBox(
+          child: widget.isLoading
+              ? const SizedBox(
                   width: 30,
-                  height: 15,
-                  child: RiveAnimation.asset(
-                    AppAssets.waiting_anim,
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center,
+                  height: 30,
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.transparent,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                   ),
                 )
-              : widget.isLoading && !showAnim
-                  ? const SizedBox(
-                      width: 30,
-                      height: 30,
-                      child: CircularProgressIndicator(
-                        backgroundColor: Colors.transparent,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              : widget.icon != null
+                  ? SvgPicture.asset(widget.icon!)
+                  : Text(
+                      widget.lbl,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
                       ),
-                    )
-                  : widget.icon != null
-                      ? SvgPicture.asset(widget.icon!)
-                      : Text(
-                          widget.lbl,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                          ),
-                        )),
+                    )),
     );
   }
 }

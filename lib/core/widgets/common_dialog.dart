@@ -14,14 +14,7 @@ class CommonDialog {
         child: Column(
           children: [
             const SizedBox(height: 10),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: titleSize,
-                fontWeight: FontWeight.bold,
-                fontFamily: "Montserrat",
-              ),
-            ),
+            Text(title, style: Theme.of(context).textTheme.displayLarge),
           ],
         ),
       ),

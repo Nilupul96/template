@@ -40,7 +40,7 @@ class MainDropDown<T> extends StatelessWidget {
         ),
         items: items.map((value) {
           var obj;
-          var lbl;
+          late String lbl;
 
           if (T == String) {
             obj = value as String;
