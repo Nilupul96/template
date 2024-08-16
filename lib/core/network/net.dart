@@ -1,33 +1,31 @@
-// ignore_for_file: non_constant_identifier_names
-// ignore: constant_identifier_names
 import 'dart:convert';
 import 'dart:io';
+import 'package:dio/dio.dart';
 import '../helpers/app_logger.dart';
 import '../helpers/local_storage.dart';
-import 'cache_network_service.dart';
 import 'net_exception.dart';
 import 'net_result.dart';
-import 'package:http/http.dart' as http;
 import 'network_error_handler.dart';
 
-// ignore: constant_identifier_names
-enum NetMethod { GET, POST, DELETE, PUT, MULTIPART }
+enum NetMethod { GET, POST, DELETE, PUT, MULTIPART, DOWNLOAD }
 
 class Net {
-  String url;
+  final dio = Dio();
+  final String url;
+  final NetMethod method;
+  dynamic body;
   Map<String, String>? queryParam;
   Map<String, String>? pathParam;
   Map<String, String>? fields;
   Map<String, String>? imagePathList;
   Map<String, String>? headers;
-  String test;
-  dynamic body;
-  NetMethod method;
   bool excludeToken;
   final int _retryMaxCount = 3;
   int _retryCount = 0;
   bool isRetryEnable = false;
-  static String? _TOKEN;
+  ProgressCallback? onSendProgress;
+  ProgressCallback? onReceiveProgress;
+  String? _TOKEN;
 
   Net({
     required this.url,
@@ -37,12 +35,11 @@ class Net {
     this.fields,
     this.imagePathList,
     this.headers,
-    this.test = "",
     this.excludeToken = false,
   });
 
   Future<Result> perform() async {
-    http.Response response;
+    Response response;
     switch (method) {
       case NetMethod.GET:
         response = await get();
@@ -59,136 +56,130 @@ class Net {
       case NetMethod.MULTIPART:
         response = await multiPart();
         break;
+      case NetMethod.DOWNLOAD:
+        response = await download();
+        break;
     }
 
     return await isOk(response);
   }
 
-  Future<http.Response> get() async {
+  Future<Response> get() async {
     Log.debug("request - GET | url - $url | ");
-    String url_ =
-        "${getPathParameters(url)}?${Uri(queryParameters: queryParam).query}";
-
-    Uri uri = Uri.parse(url_);
+    String url_ = getPathParameters(url);
     var headers = await getHeadersForRequest();
-    Log.debug('------headers-----${headers.toString()}');
-
-    Log.debug("request - GET | url - $uri | headers - ${headers.toString()}");
-    final response = await http.get(uri, headers: headers);
+    Log.debug("request - GET | url - $url_ | headers - ${headers.toString()}");
+    final response = await dio.get(url_,
+        queryParameters: queryParam, options: Options(headers: headers));
 
     Log.debug(
-        "response - GET | url - $uri | body - ${response.body}| headers - ${response.headers.toString()}");
+        "response - GET | url - $url_ | body - ${response.data}| headers - ${response.headers.toString()}");
     return response;
   }
 
-  Future<http.Response> post() async {
-    String url_ =
-        "${getPathParameters(url)}?${Uri(queryParameters: queryParam).query}";
-
-    Uri uri = Uri.parse(url_);
+  Future<Response> post() async {
+    String url_ = getPathParameters(url);
 
     var headers = await getHeadersForRequest();
-    Log.debug("request - POST | url - $url_ | headers - ${headers.toString()}");
+    Log.debug("request - POST | url - $url_ | headers - $headers");
 
-    final response = await http.post(
-      uri,
-      headers: headers,
-      body: body == null ? "" : jsonEncode(body),
+    final response = await dio.post(
+      url_,
+      queryParameters: queryParam,
+      options: Options(headers: headers),
+      data: body == null ? null : jsonEncode(body),
     );
 
     Log.debug(
-        "response - POST | url - $url_ | body - ${response.body}| headers - ${response.headers.toString()}");
+        "response - POST | url - $url_ | body - ${response.data}| headers - ${response.headers}");
 
     return response;
   }
 
-  Future<http.Response> put() async {
-    Log.debug("request - PUT | url - $url | ");
-    String url_ =
-        "${getPathParameters(url)}?${Uri(queryParameters: queryParam).query}";
-    Uri uri = Uri.parse(url_);
+  Future<Response> put() async {
+    String url_ = getPathParameters(url);
     var headers = await getHeadersForRequest();
 
     Log.debug("request - PUT | url - $url_ | headers - ${headers.toString()}");
-    final response = await http.put(
-      uri,
-      headers: headers,
-      body: body == null ? "" : jsonEncode(body),
+    final response = await dio.put(
+      url_,
+      queryParameters: queryParam,
+      options: Options(headers: headers),
+      data: body == null ? null : jsonEncode(body),
     );
     Log.debug(
-        "response - PUT | url - $url_ | body - ${response.body}| headers - ${response.headers.toString()}");
+        "response - PUT | url - $url_ | body - ${response.data}| headers - ${response.headers}");
     return response;
   }
 
-  Future<http.Response> delete() async {
-    String url_ =
-        "${getPathParameters(url)}?${Uri(queryParameters: queryParam).query}";
-    Uri uri = Uri.parse(url_);
-
+  Future<Response> delete() async {
+    String url_ = "${getPathParameters(url)}}";
     var headers = await getHeadersForRequest();
 
     Log.debug(
         "request - DELETE | url - $url_ | headers - ${headers.toString()}");
 
-    final response = await http.delete(
-      uri,
-      headers: headers,
-      body: body == null ? "" : jsonEncode(body),
+    final response = await dio.delete(
+      url_,
+      queryParameters: queryParam,
+      options: Options(headers: headers),
+      data: body == null ? null : jsonEncode(body),
     );
 
     Log.debug(
-        "response - DELETE | url - $url_ | body - ${response.body}| headers - ${response.headers.toString()}");
+        "response - DELETE | url - $url_ | body - ${response.data}| headers - ${response.headers}");
     return response;
   }
 
-  Future<http.Response> multiPart() async {
-    List<http.MultipartFile> multipartFiles = [];
-
-    String url_ =
-        "${getPathParameters(url)}?${Uri(queryParameters: queryParam).query}";
-    Uri uri = Uri.parse(url_);
-
+  Future<Response> multiPart() async {
+    String url_ = getPathParameters(url);
     var headers = await getHeadersForRequest();
+    final formData = FormData.fromMap({});
 
     Log.debug(
         "request - MULTIPART | url - $url_ | headers - ${headers.toString()}");
 
-    var request = http.MultipartRequest("POST", uri);
-    request.headers.addAll(headers);
-    fields ??= {};
-    fields!.forEach((key, value) {
-      request.fields['$key'] = value;
-    });
-    imagePathList ??= {};
-    List<dynamic> data = imagePathList!.entries.cast().toList();
-
-    for (var i = 0; i < data.length; i++) {
-      http.MultipartFile multipartFile =
-          await http.MultipartFile.fromPath('${data[i].key}', data[i].value);
-
-      multipartFiles.add(multipartFile);
+    if (fields != null) {
+      formData.fields.addAll(fields!.entries);
     }
 
-    request.files.addAll(multipartFiles);
-
-    var response = await request.send();
-
-    var body = await response.stream.bytesToString();
-    Log.debug("http api multipart- ${response.statusCode}$body");
-
-    if (response.statusCode >= 200 && response.statusCode < 300) {
-      Log.debug(
-          '------ server error: statusCode - ${response.statusCode} -----');
+    if (imagePathList != null) {
+      for (final imagePath in imagePathList!.entries) {
+        MultipartFile multipartFile =
+            await MultipartFile.fromFile(imagePath.value);
+        formData.files.addAll({imagePath.key: multipartFile}.entries);
+      }
     }
 
-    http.Response res = http.Response(body, response.statusCode);
-    return res;
+    final response = await dio.post(url_,
+        queryParameters: queryParam,
+        options: Options(headers: headers),
+        data: formData,
+        onSendProgress: onSendProgress);
+    Log.debug(
+        "response - POST | url - $url_ | body - ${response.data}| headers - ${response.headers}");
+
+    return response;
   }
 
-  printMap(Map map) {
-    for (final e in map.entries) {
-      Log.debug('${e.key} = ${e.value}');
-    }
+  Future<Response> download() async {
+    String url_ = getPathParameters(url);
+    var headers = await getHeadersForRequest();
+
+    Log.debug(
+        "request - DOWNLOAD | url - $url_ | headers - ${headers.toString()}");
+
+    final response = await dio.download(
+      url_,
+      'path',
+      queryParameters: queryParam,
+      onReceiveProgress: onReceiveProgress,
+      options: Options(headers: headers),
+    );
+    Log.debug(
+        "response - DOWNLOAD | url - $url_ | body - ${response.data}| headers - ${response.headers}");
+
+    return response;
   }
 
   Future<Map<String, String>> getHeadersForRequest() async {
@@ -220,11 +211,11 @@ class Net {
     return url;
   }
 
-  Future<Result> isOk(http.Response response) async {
+  Future<Result> isOk(Response response) async {
     Result result = Result();
     result.statusCode = response.statusCode;
     result.net = this;
-    result.token = response.headers['authorization'];
+    result.token = "${response.headers['authorization']}";
 
     NetException? netException = NetworkErrorHandler.handleError(response);
     if (netException != null) {
@@ -251,7 +242,7 @@ class Net {
       return await result.net!.perform();
     }
 
-    result.result = response.body;
+    result.result = response.data;
     return result;
   }
 

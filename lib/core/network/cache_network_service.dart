@@ -36,6 +36,7 @@ class CacheNetworkService extends Net {
     await cacheService!.init(hiveBox);
   }
 
+  @override
   Future<Result> perform() async {
     Result result = Result();
     var key = await processUrl();

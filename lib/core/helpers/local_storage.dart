@@ -3,7 +3,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app_logger.dart';
 
-
 class LocalStorage {
   static final LocalStorage _singleton = LocalStorage._internal();
 
@@ -13,9 +12,8 @@ class LocalStorage {
 
   LocalStorage._internal();
 
-  static String get USER_TOKEN_KEY => "com.getin.app.user_token";
-  static String get IS_SESSION_EXPIRED => "com.getin.app.is_session_expired";
-  
+  static String get USER_TOKEN_KEY => "com.template.app.user_token";
+  static String get IS_SESSION_EXPIRED => "com.template.app.is_session_expired";
 
   Future<String?> getUserToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -24,8 +22,7 @@ class LocalStorage {
 
   Future<void> saveToken(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-   await prefs.setString(USER_TOKEN_KEY, token);
+    await prefs.setString(USER_TOKEN_KEY, token);
     Log.info("$token save in local");
   }
-
 }

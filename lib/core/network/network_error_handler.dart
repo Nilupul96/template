@@ -1,12 +1,12 @@
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import '../helpers/app_logger.dart';
 import 'net_exception.dart';
 
 class NetworkErrorHandler {
-  static NetException? handleError(http.Response response,
+  static NetException? handleError(Response response,
       {List<int>? ignoreCodes}) {
     Log.debug("NetworkErrorHandler  ${response.statusCode}");
-    if (response.statusCode >= 200 && response.statusCode < 300) {
+    if (response.statusCode! >= 200 && response.statusCode! < 300) {
       return null;
     }
 
@@ -25,7 +25,7 @@ class NetworkErrorHandler {
         errorMessage.messageId = CommonMessageId.NOT_FOUND;
         errorMessage.message = CommonMessages.ENDPOINT_NOT_FOUND;
       } else {
-        errorMessage = netExceptionFromJson(response.body);
+        errorMessage = netExceptionFromJson(response.data);
       }
     } catch (e) {
       errorMessage = NetException();
